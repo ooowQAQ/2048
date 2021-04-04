@@ -117,7 +117,7 @@ body {
 	position: absolute;
 	left: 110px;/* 500-280/2 */
 	text-align: center;
-	width: 280px;
+	/* width: 280px; */
 	/* height: 160px; */
 	border-radius: 5px;
 	/*border: 1px solid red;*/
