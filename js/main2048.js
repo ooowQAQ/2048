@@ -1,5 +1,4 @@
 var board = new Array();//游戏数据以数组呈现
-var score = 0;//游戏分数
 var hasConflicted = new Array();//有数字已经做过一次加法了不能再加了
 var startx = 0;
 var starty = 0;
@@ -28,9 +27,15 @@ function prepareForMobile() {
 function newgame() {
     //初始化棋盘
     init();
+    //分数初始化
+    clear();
     //随机生成两个数字
     generateOneNumber();//在空白随机生成一个数字
     generateOneNumber();
+}
+
+function clear() {
+    document.getElementsByClassName("score")[0].children[2].innerHTML = "0";
 }
 
 function init() {
@@ -51,8 +56,8 @@ function init() {
         }
     }
     updateBoardView();                      //设定格子中的数字
-    score = 0;                              //分数初始化
 }
+
 
 function updateBoardView() {
     $(".number-cell").remove();
@@ -81,7 +86,7 @@ function updateBoardView() {
         }
     }
     $('.number-cell').css('line-height', cellSideLength + 'px');
-    $('.number-cell').css('font-size', 0.5 * cellSideLength + 'px');
+    $('.number-cell').css('font-size', 0.4 * cellSideLength + 'px');
 }
 
 function generateOneNumber() {
@@ -188,16 +193,45 @@ document.addEventListener('touchend', function (event) {//容易造成点击误�
 
 function isgameover() {
     if (nospace(board) && nomove(board)) {
-        gameover();
+        popup("game-over");
     }
 }
 
-function gameover() {
-    alert("gameover");
+function popup(popType) {
+    var num,
+        tryAgainEle,
+        ele = document.getElementsByClassName(popType)[0],
+        headerEle = document.getElementsByClassName("header")[0],
+        gameBoardEle = document.getElementById("grid-container");
+    ele.style.display = "block";
+    headerEle.style.opacity = "0.4";//header不透明度
+    gameBoardEle.style.opacity = "0.4";//表格不透明度
+
+    // tryAgain(num);
+    if (popType == "game-over") {
+        num = 0;
+    }
+    if (popType == "win") {
+        num = 1;
+    }
+    tryAgainEle = document.getElementsByClassName("try-again")[num];
+    tryAgainEle.addEventListener("click", function () {
+        tryAgain(ele, headerEle, gameBoardEle);
+    }, false);
+    tryAgainEle.addEventListener("touchend", function () {
+        tryAgain(ele, headerEle, gameBoardEle);
+    }, false);
 }
 
+function tryAgain(ele, headerEle, gameBoardEle) {
+    ele.style.display = "none";
+    headerEle.style.opacity = "1.0";
+    gameBoardEle.style.opacity = "1.0";
+    newgame();
+}
 
 function moveLeft() {
+    var count = 0;
     if (!canMoveLeft(board))//传入当前情况如果不能移动直接return false退出
         return false;
     for (var i = 0; i < 4; i++) {
@@ -216,8 +250,7 @@ function moveLeft() {
                         board[i][k] += board[i][j];
                         board[i][j] = 0;
                         //加分
-                        score += board[i][k];
-                        updateScore(score);
+                        count += board[i][k];//每一行的加分
                         hasConflicted[i][k] = true;
                         continue;
                     }
@@ -225,11 +258,15 @@ function moveLeft() {
             }
         }
     }
+    if (count > 0) {
+        addScore(count);
+    }
     setTimeout("updateBoardView()", 200);//刷新数组中的数
     return true;
 }
 
 function moveUp() {
+    var count = 0;
     if (!canMoveUp(board))
         return false;
     for (var i = 1; i < 4; i++) {
@@ -246,8 +283,7 @@ function moveUp() {
                         showMoveAnimation(i, j, k, j);
                         board[k][j] += board[i][j];
                         board[i][j] = 0;
-                        score += board[k][j];
-                        updateScore(score);
+                        count += board[k][j];
                         hasConflicted[k][j] = true;
                         continue;
                     }
@@ -255,11 +291,15 @@ function moveUp() {
             }
         }
     }
+    if (count > 0) {
+        addScore(count);
+    }
     setTimeout("updateBoardView()", 200);//刷新数组中的数
     return true;
 }
 
 function moveRight() {
+    var count = 0;
     if (!canMoveRight(board))
         return false;
     for (var i = 0; i < 4; i++) {
@@ -276,8 +316,7 @@ function moveRight() {
                         showMoveAnimation(i, j, i, k);
                         board[i][k] += board[i][j];
                         board[i][j] = 0;
-                        score += board[i][k];
-                        updateScore(score);
+                        count += board[i][k];
                         hasConflicted[i][k] = true;
                         continue;
                     }
@@ -285,11 +324,15 @@ function moveRight() {
             }
         }
     }
+    if (count > 0) {
+        addScore(count);
+    }
     setTimeout("updateBoardView()", 200);//刷新数组中的数
     return true;
 }
 
 function moveDown() {
+    var count = 0;
     if (!canMoveDown(board))
         return false;
     for (var j = 0; j < 4; j++) {
@@ -306,14 +349,16 @@ function moveDown() {
                         showMoveAnimation(i, j, k, j);
                         board[k][j] += board[i][j];
                         board[i][j] = 0;
-                        score += board[k][j];
-                        updateScore(score);
+                        count += board[k][j];
                         hasConflicted[k][j] = true;
                         continue;
                     }
                 }
             }
         }
+    }
+    if (count > 0) {
+        addScore(count);
     }
     setTimeout("updateBoardView()", 200);//刷新数组中的数
     return true;
