@@ -2,4 +2,5 @@
 一个简单的2048游戏  
 第一次测试GitHub及页面用法  
 -----添加加分动画和游戏结束页面-----  
-链接：https://ooowqaq.github.io/2048/
+链接：https://ooowqaq.github.io/2048/  
+-----适配移动端------  
